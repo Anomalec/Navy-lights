@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#11191d" />
+    <meta
+      name="description"
+      content="Учите огни и знаки судов по МППСС-72. 144 карточки: нажмите, чтобы узнать ответ, смахните, чтобы продолжить."
+    />
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <title>Огни — морские карточки</title>
+  </head>
+  <body>
+    <div id="root">
+      <div
+        id="startup"
+        role="status"
+        style="
+          font-family: Arial, sans-serif;
+          background: #11191d;
+          color: #e5e8e4;
+          min-height: 100vh;
+          display: grid;
+          place-content: center;
+          padding: 32px;
+          box-sizing: border-box;
+          text-align: center;
+        "
+      >
+        <h1 style="font-size: 32px; color: #c7eaa0">Огни</h1>
+        <p id="startup-message">Загружаем карточки…</p>
+        <p
+          id="startup-help"
+          style="
+            font-size: 14px;
+            line-height: 1.8;
+            max-width: 440px;
+            color: #a6b7ba;
+          "
+        ></p>
+      </div>
+    </div>
+    <noscript>Для тренировки включите JavaScript в браузере.</noscript>
+    <script>
+      (function () {
+        document.body.style.margin = "0";
+        document.body.style.background = "#11191d";
+        function showStartupError() {
+          var message = document.getElementById("startup-message");
+          var help = document.getElementById("startup-help");
+          if (!message || !help) return;
+          message.textContent = "Не удалось загрузить приложение";
+          help.textContent =
+            location.protocol === "file:"
+              ? "Для открытия без сервера используйте файл ogni.html. Обычный index.html нужно открывать через сервер: npm run dev."
+              : "Проверьте подключение и обновите страницу. При публикации нужно загрузить всю папку dist, включая assets и cards.";
+        }
+        window.addEventListener("error", showStartupError, true);
+        setTimeout(showStartupError, 15000);
+      })();
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "Огни — морские карточки",
+  "short_name": "Огни",
+  "lang": "ru",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#11191d",
+  "theme_color": "#11191d",
+  "icons": [{ "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
