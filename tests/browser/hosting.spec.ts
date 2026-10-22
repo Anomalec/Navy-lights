@@ -52,16 +52,31 @@ test.afterAll(async () => {
   );
 });
 
-test("the repository root on GitHub Pages opens the ready app in docs", async ({ page }) => {
+test("the repository root on GitHub Pages opens the ready app in docs", async ({
+  page,
+}) => {
   await page.route("https://anomalec.github.io/**", async (route) => {
     const pathname = new URL(route.request().url()).pathname;
-    const file = pathname === "/Navy-lights/" ? "index.html"
-      : pathname === "/Navy-lights/docs/" ? "docs/index.html" : null;
-    if (!file) { await route.fulfill({ status: 404, body: "Not found" }); return; }
-    await route.fulfill({ status: 200, contentType: "text/html; charset=utf-8", body: await readFile(resolve(file)) });
+    const file =
+      pathname === "/Navy-lights/"
+        ? "index.html"
+        : pathname === "/Navy-lights/docs/"
+          ? "docs/index.html"
+          : null;
+    if (!file) {
+      await route.fulfill({ status: 404, body: "Not found" });
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "text/html; charset=utf-8",
+      body: await readFile(resolve(file)),
+    });
   });
   await page.goto("https://anomalec.github.io/Navy-lights/");
-  await expect(page).toHaveURL("https://anomalec.github.io/Navy-lights/docs/");
+  await expect(page).toHaveURL(
+    "https://anomalec.github.io/Navy-lights/docs/?v=2",
+  );
   await expect(page.locator(".card-illustration")).toBeVisible();
   await page.getByLabel("Показать ответ на карточку").click();
   await expect(page.locator(".answer-text")).toContainText("Идёт на нас");
@@ -155,7 +170,13 @@ test("a failed script download shows an explanation instead of an empty page", a
   await page.route("**/assets/*.js", (route) => route.abort());
   await page.goto("/");
   await expect(page.getByRole("status")).toContainText(
-    "Не удалось загрузить приложение",
+    "Не удалось запустить карточки",
   );
-  await expect(page.getByRole("status")).toContainText("всю папку dist");
+  await expect(page.getByRole("status")).toContainText(
+    "Ваш прогресс сохранится",
+  );
+  await page.unroute("**/assets/*.js");
+  await page.getByRole("button", { name: "Обновить приложение" }).click();
+  await expect(page).toHaveURL(/\?v=\d+$/);
+  await expect(page.locator(".card-illustration")).toBeVisible();
 });

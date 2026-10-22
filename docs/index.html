@@ -2,6 +2,7 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
+    <!-- Vite removes this redirect when serving or building the app. -->
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
@@ -229,6 +230,36 @@ Error generating stack: `+e.message+`
             color: #a6b7ba;
           "
         ></p>
+        <button
+          id="startup-retry"
+          type="button"
+          hidden
+          style="
+            background: #c7eaa0;
+            color: #182c22;
+            border: 0;
+            border-radius: 7px;
+            padding: 14px 22px;
+            font: inherit;
+            cursor: pointer;
+            justify-self: center;
+          "
+        >
+          Обновить приложение
+        </button>
+        <details
+          id="startup-diagnostics"
+          hidden
+          style="
+            max-width: 440px;
+            margin-top: 24px;
+            color: #a6b7ba;
+            font-size: 13px;
+          "
+        >
+          <summary>Подробности ошибки</summary>
+          <p id="startup-error-detail" style="overflow-wrap: anywhere"></p>
+        </details>
       </div>
     </div>
     <noscript>Для тренировки включите JavaScript в браузере.</noscript>
@@ -236,26 +267,29 @@ Error generating stack: `+e.message+`
       (function () {
         document.body.style.margin = "0";
         document.body.style.background = "#11191d";
-        document.addEventListener("DOMContentLoaded", function () {
-          // Branch-based Pages can serve this development entry from the repo root.
-          // Built entries have no source-module tag and must stay at their own URL.
-          if (
-            location.hostname.endsWith(".github.io") &&
-            document.querySelector('script[type="module"][src="/src/main.tsx"]')
-          ) {
-            location.replace(new URL("./docs/", location.href).href);
-          }
-        });
-        function showStartupError() {
+        function showStartupError(event) {
           var message = document.getElementById("startup-message");
           var help = document.getElementById("startup-help");
           if (!message || !help) return;
-          message.textContent = "Не удалось загрузить приложение";
+          message.textContent = "Не удалось запустить карточки";
           help.textContent =
-            location.protocol === "file:"
-              ? "Для открытия без сервера используйте файл ogni.html. Обычный index.html нужно открывать через сервер: npm run dev."
-              : "Проверьте подключение и обновите страницу. При публикации нужно загрузить всю папку dist, включая assets и cards.";
+            "Нажмите «Обновить приложение», чтобы загрузить свежую версию. Ваш прогресс сохранится.";
+          document.getElementById("startup-retry").hidden = false;
+          document.getElementById("startup-diagnostics").hidden = false;
+          document.getElementById("startup-error-detail").textContent =
+            event && event.message
+              ? String(event.message).slice(0, 300)
+              : event && event.target && event.target.tagName === "SCRIPT"
+                ? "Браузер не смог загрузить код приложения."
+                : "Загрузка приложения не завершилась.";
         }
+        document
+          .getElementById("startup-retry")
+          .addEventListener("click", function () {
+            var url = new URL(location.href);
+            url.searchParams.set("v", String(Date.now()));
+            location.replace(url.href);
+          });
         window.addEventListener("error", showStartupError, true);
         setTimeout(showStartupError, 15000);
       })();
