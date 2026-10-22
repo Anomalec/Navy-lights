@@ -52,6 +52,21 @@ test.afterAll(async () => {
   );
 });
 
+test("the repository root on GitHub Pages opens the ready app in docs", async ({ page }) => {
+  await page.route("https://anomalec.github.io/**", async (route) => {
+    const pathname = new URL(route.request().url()).pathname;
+    const file = pathname === "/Navy-lights/" ? "index.html"
+      : pathname === "/Navy-lights/docs/" ? "docs/index.html" : null;
+    if (!file) { await route.fulfill({ status: 404, body: "Not found" }); return; }
+    await route.fulfill({ status: 200, contentType: "text/html; charset=utf-8", body: await readFile(resolve(file)) });
+  });
+  await page.goto("https://anomalec.github.io/Navy-lights/");
+  await expect(page).toHaveURL("https://anomalec.github.io/Navy-lights/docs/");
+  await expect(page.locator(".card-illustration")).toBeVisible();
+  await page.getByLabel("Показать ответ на карточку").click();
+  await expect(page.locator(".answer-text")).toContainText("Идёт на нас");
+});
+
 test("loads in a hosting subdirectory and can reload there offline", async ({
   page,
   context,

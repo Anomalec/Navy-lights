@@ -236,6 +236,16 @@ Error generating stack: `+e.message+`
       (function () {
         document.body.style.margin = "0";
         document.body.style.background = "#11191d";
+        document.addEventListener("DOMContentLoaded", function () {
+          // Branch-based Pages can serve this development entry from the repo root.
+          // Built entries have no source-module tag and must stay at their own URL.
+          if (
+            location.hostname.endsWith(".github.io") &&
+            document.querySelector('script[type="module"][src="/src/main.tsx"]')
+          ) {
+            location.replace(new URL("./docs/", location.href).href);
+          }
+        });
         function showStartupError() {
           var message = document.getElementById("startup-message");
           var help = document.getElementById("startup-help");
